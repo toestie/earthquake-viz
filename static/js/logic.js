@@ -14,11 +14,11 @@ function createMap(response) {
             let coord = [data.geometry.coordinates[1], data.geometry.coordinates[0]]
             return L.circle(coord, {
                 radius: data.properties.mag * 30000,
-                color: "white",
+                color: "yellow",
                 fillColor: chooseColor(data.properties.mag),
                 fillOpacity: 0.75,
                 weight: 0.5
-            }).bindPopup("<h1>" + data.properties.title + "</h1> <hr> <h3>Magnitude: " + data.properties.mag + "</h3>").addTo(myMap);
+            }).bindPopup("<h2>Magnitude: " + data.properties.mag + "</h2> <hr> <h3>" + data.properties.title.split('- ')[1] + "</h3>").addTo(myMap);
         }
     })
     
