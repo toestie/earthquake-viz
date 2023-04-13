@@ -1,80 +1,84 @@
 mapboxgl.accessToken = API_KEY;
 
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v11',
+    center: [-95.486052, 37.830348],
+    zoom: 4
+});
+
+map.addControl(new mapboxgl.NavigationControl());
+
+function createMap() {
+    // GeoJSON data by USGS
+    map.addSource('earthquakes', {
+        type: 'geojson',
+        data: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson',
+    });
+    
+    const mag1 = ['<', ['get', 'mag'], 1.5];
+    const mag2 = ['all', ['>=', ['get', 'mag'], 1.5], ['<', ['get', 'mag'], 2.5]];
+    const mag3 = ['all', ['>=', ['get', 'mag'], 2.5], ['<', ['get', 'mag'], 3.5]];
+    const mag4 = ['all', ['>=', ['get', 'mag'], 3.5], ['<', ['get', 'mag'], 4.5]];
+    const mag5 = ['all', ['>=', ['get', 'mag'], 4.5], ['<', ['get', 'mag'], 5.5]];
+    const mag6 = ['all', ['>=', ['get', 'mag'], 5.5], ['<', ['get', 'mag'], 6.5]];
+
+    // https://gka.github.io/palettes/#/9|s|00429d,96ffea,ffffe0|ffffe0,ff005e,93003a|1|1
+    colorlist = ['#e31a1c', '#ee542c', '#f87b45', '#ff9e65', '#ffc08b', '#ffe0b4', '#ffffe0'];
+
+    map.addLayer({
+        'id': 'earthquakes-layer',
+        'type': 'circle',
+        'source': 'earthquakes',
+        'paint': {
+            "circle-radius": [
+                "interpolate", ["linear"], ["zoom"],
+                // when zoom is 0 (zoomed out)
+                0, ["*", 0.5, ["get", "mag"]],
+                // when zoom is 10 (zoomed in)
+                10, ["*", 10, ["get", "mag"]]
+            ],
+            'circle-stroke-width': 0.5,
+            'circle-color': ['case',
+                mag1,
+                colorlist[6],
+                mag2,
+                colorlist[5],
+                mag3,
+                colorlist[4],
+                mag4,
+                colorlist[3],
+                mag5,
+                colorlist[2],
+                mag6,
+                colorlist[1],
+                colorlist[0]
+            ],
+            'circle-opacity': 0.75,
+            'circle-stroke-color': 'red'
+        }
+    });
+}
+
+map.on('load', () => {createMap()});
+
+// map type switch panel
 const layerList = document.getElementById('menu');
 const inputs = layerList.getElementsByTagName('input');
- 
+
 for (const input of inputs) {
     input.onclick = (layer) => {
         const layerId = layer.target.id;
         map.setStyle('mapbox://styles/mapbox/' + layerId);
-        createMap()
+        createMap();
     };
 }
 
-function createMap() {
-    const map = new mapboxgl.Map({
-        container: 'map',
-        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
-        style: 'mapbox://styles/mapbox/light-v11',
-        center: [-95.486052, 37.830348],
-        zoom: 4
-    });
-    
-    map.addControl(new mapboxgl.NavigationControl());
-    
-    map.on('load', () => {
-        // GeoJSON data by USGS
-        map.addSource('earthquakes', {
-            type: 'geojson',
-            data: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson',
-        });
-        
-        const mag1 = ['<', ['get', 'mag'], 2];
-        const mag2 = ['all', ['>=', ['get', 'mag'], 2], ['<', ['get', 'mag'], 3]];
-        const mag3 = ['all', ['>=', ['get', 'mag'], 3], ['<', ['get', 'mag'], 4]];
-        const mag4 = ['all', ['>=', ['get', 'mag'], 4], ['<', ['get', 'mag'], 5]];
-        const mag5 = ['all', ['>=', ['get', 'mag'], 5], ['<', ['get', 'mag'], 6]];
-        const mag6 = ['all', ['>=', ['get', 'mag'], 6], ['<', ['get', 'mag'], 7]];
-    
-        // https://gka.github.io/palettes/#/9|s|00429d,96ffea,ffffe0|ffffe0,ff005e,93003a|1|1
-        colorlist = ['#e31a1c', '#ee542c', '#f87b45', '#ff9e65', '#ffc08b', '#ffe0b4', '#ffffe0'];
-    
-        map.addLayer({
-            'id': 'earthquakes-layer',
-            'type': 'circle',
-            'source': 'earthquakes',
-            'paint': {
-                "circle-radius": [
-                    "interpolate", ["linear"], ["zoom"],
-                    // when zoom is 0 (zoomed out)
-                    0, ["*", 0.5, ["get", "mag"]],
-                    // when zoom is 10 (zoomed in)
-                    10, ["*", 10, ["get", "mag"]]
-                ],
-                'circle-stroke-width': 0.5,
-                'circle-color': ['case',
-                    mag1,
-                    colorlist[6],
-                    mag2,
-                    colorlist[5],
-                    mag3,
-                    colorlist[4],
-                    mag4,
-                    colorlist[3],
-                    mag5,
-                    colorlist[2],
-                    mag6,
-                    colorlist[1],
-                    colorlist[0]
-                ],
-                'circle-opacity': 0.75,
-                'circle-stroke-color': 'red'
-            }
-        });
-    });
-}
 
-createMap()
+// makes sure elements persist when changing map style
+map.on('style.load', () => {
+    createMap();
+    });
 
 // Old Leaflet Code---------------------------------------------
 
