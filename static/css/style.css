@@ -1,4 +1,25 @@
 body {
+  margin: 0;
+  padding: 0;
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+#menu {
+  position: absolute;
+  background: #efefef;
+  padding: 10px;
+  font-family: 'Open Sans', sans-serif;
+  }
+
+  
+/* old code */
+/* body {
   padding: 0;
   margin: 0;
 }
@@ -29,4 +50,4 @@ html {
   float: left;
   margin-right: 8px;
   opacity: 0.6;
-}
+} */
