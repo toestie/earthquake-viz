@@ -37,7 +37,7 @@ function addEarthquakes() {
                 // when zoom is 0 (zoomed out)
                 0, ["*", 0.5, ["get", "mag"]],
                 // when zoom is 10 (zoomed in)
-                10, ["*", 10, ["get", "mag"]]
+                10, ["*", 12, ["get", "mag"]]
             ],
             'circle-stroke-width': 0.5,
             'circle-color': ['case',
@@ -101,6 +101,7 @@ function addPlates() {
         },
         'paint': {
             'line-color': '#4264FB',
+            'line-opacity': 0.75,
             'line-width': 2
         }
     });
