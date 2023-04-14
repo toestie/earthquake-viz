@@ -7,9 +7,11 @@ const map = new mapboxgl.Map({
     zoom: 4
 });
 
+var layerId = 'light-v11';
+
 map.addControl(new mapboxgl.NavigationControl());
 
-function createMap() {
+function addEarthquakes() {
     // GeoJSON data by USGS
     map.addSource('earthquakes', {
         type: 'geojson',
@@ -58,9 +60,32 @@ function createMap() {
             'circle-stroke-color': 'red'
         }
     });
+
+    // When clicking on earthquake node, popup displays some basic information
+    map.on('click', 'earthquakes-layer', (e) => {
+        // Copy coordinates array.
+        const Emag = e.features[0].properties.mag;
+        const Eplace = e.features[0].properties.place;
+        const Ecoordinates = e.features[0].geometry.coordinates;
+        const Edate = new Date(e.features[0].properties.time);
+         
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - Ecoordinates[0]) > 180) {
+        Ecoordinates[0] += e.lngLat.lng > Ecoordinates[0] ? 360 : -360;
+        }
+         
+        const infobox = new mapboxgl.Popup()
+        .setLngLat(Ecoordinates)
+        .setHTML(
+            "<h3>Magnitude: " + Emag + "</h3> <hr> " + Eplace + " on " + Edate
+            )
+        .addTo(map);
+    });
 }
 
-map.on('load', () => {createMap()});
+map.on('load', () => {addEarthquakes()});
 
 // map type switch panel
 const layerList = document.getElementById('menu');
@@ -68,16 +93,15 @@ const inputs = layerList.getElementsByTagName('input');
 
 for (const input of inputs) {
     input.onclick = (layer) => {
-        const layerId = layer.target.id;
+        layerId = layer.target.id;
         map.setStyle('mapbox://styles/mapbox/' + layerId);
-        createMap();
     };
 }
 
 
 // makes sure elements persist when changing map style
 map.on('style.load', () => {
-    createMap();
+    addEarthquakes();
     });
 
 // Old Leaflet Code---------------------------------------------
