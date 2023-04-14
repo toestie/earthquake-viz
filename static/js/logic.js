@@ -31,6 +31,9 @@ function addEarthquakes() {
         'id': 'earthquakes-layer',
         'type': 'circle',
         'source': 'earthquakes',
+        'layout': {
+            'visibility': 'visible',
+        },
         'paint': {
             "circle-radius": [
                 "interpolate", ["linear"], ["zoom"],
@@ -96,8 +99,6 @@ function addPlates() {
         'source': 'tectonic',
         'layout': {
             'visibility': 'visible',
-            'line-join': 'round',
-            'line-cap': 'round'
         },
         'paint': {
             'line-color': '#4264FB',
