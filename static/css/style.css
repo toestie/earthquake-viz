@@ -12,8 +12,10 @@ body {
 
 #menu {
   position: absolute;
-  background: #efefef;
+  background: #3D3D3D;
+  color: white;
   padding: 10px;
+  margin: 10px;
   font-family: 'Open Sans', sans-serif;
 }
 

@@ -1,21 +1,20 @@
 mapboxgl.accessToken = API_KEY;
 
+// 1. Create the base map with movement controls
 const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v11',
     center: [-95.486052, 37.830348],
     zoom: 4
 });
-
-var layerId = 'light-v11';
-
 map.addControl(new mapboxgl.NavigationControl());
 
+// 2. A function to add the earthquakes to the map and on-click popups.
 function addEarthquakes() {
     // GeoJSON data by USGS
     map.addSource('earthquakes', {
         type: 'geojson',
-        data: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson',
+        data: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson'
     });
     
     const mag1 = ['<', ['get', 'mag'], 1.5];
@@ -63,7 +62,6 @@ function addEarthquakes() {
 
     // When clicking on earthquake node, popup displays some basic information
     map.on('click', 'earthquakes-layer', (e) => {
-        // Copy coordinates array.
         const Emag = e.features[0].properties.mag;
         const Eplace = e.features[0].properties.place;
         const Ecoordinates = e.features[0].geometry.coordinates;
@@ -76,7 +74,7 @@ function addEarthquakes() {
         Ecoordinates[0] += e.lngLat.lng > Ecoordinates[0] ? 360 : -360;
         }
          
-        const infobox = new mapboxgl.Popup()
+        new mapboxgl.Popup()
         .setLngLat(Ecoordinates)
         .setHTML(
             "<h3>Magnitude: " + Emag + "</h3> <hr> " + Eplace + " on " + Edate
@@ -85,9 +83,30 @@ function addEarthquakes() {
     });
 }
 
-map.on('load', () => {addEarthquakes()});
+// 3. A function to add the tectonic plate boundary lines
+function addPlates() {
+    map.addSource('tectonic', {
+            type: 'geojson',
+            data: 'https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json'
+        });
 
-// map type switch panel
+    map.addLayer({
+        'id': 'boundaries',
+        'type': 'line',
+        'source': 'tectonic',
+        'layout': {
+            'visibility': 'visible',
+            'line-join': 'round',
+            'line-cap': 'round'
+        },
+        'paint': {
+            'line-color': '#4264FB',
+            'line-width': 2
+        }
+    });
+}
+
+// 4. Give user the ability to switch between map types and toggle overlays
 const layerList = document.getElementById('menu');
 const inputs = layerList.getElementsByTagName('input');
 
@@ -98,11 +117,70 @@ for (const input of inputs) {
     };
 }
 
+// Have overlays initially already loaded
+map.on('load', () => {
+    addEarthquakes();
+    addPlates();
+});
 
 // makes sure elements persist when changing map style
 map.on('style.load', () => {
     addEarthquakes();
-    });
+    addPlates();
+});
+
+// map.on('idle', () => {
+//     // If these two layers were not added to the map, abort
+//     if (!map.getLayer('earthquakes-layer') || !map.getLayer('tectonicplates')) {
+//         return;
+//     }
+        
+//     // Enumerate ids of the layers.
+//     const toggleableLayerIds = ['earthquakes-layer', 'tectonicplates'];
+        
+//     // Set up the corresponding toggle button for each layer.
+//     for (const id of toggleableLayerIds) {
+//         // Skip layers that already have a button set up.
+//         if (document.getElementById(id)) {
+//             continue;
+//         }
+        
+//         // Create a link.
+//         const link = document.createElement('a');
+//         link.id = id;
+//         link.href = '#';
+//         link.textContent = id;
+//         link.className = 'active';
+            
+//         // Show or hide layer when the toggle is clicked.
+//         link.onclick = function (e) {
+//             const clickedLayer = this.textContent;
+//             e.preventDefault();
+//             e.stopPropagation();
+                
+//             const visibility = map.getLayoutProperty(
+//                 clickedLayer,
+//                 'visibility'
+//             );
+                
+//             // Toggle layer visibility by changing the layout object's visibility property.
+//             if (visibility === 'visible') {
+//                 map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+//                 this.className = '';
+//             } else {
+//                 this.className = 'active';
+//                 map.setLayoutProperty(
+//                     clickedLayer,
+//                     'visibility',
+//                     'visible'
+//                 );
+//             }
+//         };
+            
+//         const layers = document.getElementById('menu');
+//         layers.appendChild(link);
+//     }
+// });
 
 // Old Leaflet Code---------------------------------------------
 
