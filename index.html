@@ -22,22 +22,26 @@
   <div id="menu">
     <!-- See a list of Mapbox-hosted public styles at -->
     <!-- https://docs.mapbox.com/api/maps/styles/#mapbox-styles -->
-    <input id="light-v11" type="radio" name="rtoggle" value="light" checked="checked">
-    <label for="light-v11">Light</label>
-    <br>
-    <input id="dark-v11" type="radio" name="rtoggle" value="dark">
-    <label for="dark-v11">Dark</label>
-    <br>
-    <!-- <input id="streets-v12" type="radio" name="rtoggle" value="streets">
-    <label for="streets-v12">streets</label> -->
-    <input id="outdoors-v12" type="radio" name="rtoggle" value="outdoors">
-    <label for="outdoors-v12">Terrain</label>
+    <div id="mapslist">
+      <input id="light-v11" type="radio" name="rtoggle" value="light" checked="checked">
+      <label for="light-v11">Light</label>
+      <br>
+      <input id="dark-v11" type="radio" name="rtoggle" value="dark">
+      <label for="dark-v11">Dark</label>
+      <br>
+      <!-- <input id="streets-v12" type="radio" name="rtoggle" value="streets">
+      <label for="streets-v12">streets</label> -->
+      <input id="outdoors-v12" type="radio" name="rtoggle" value="outdoors">
+      <label for="outdoors-v12">Terrain</label>
+    </div>
     <hr>
-    <input id="earthquakes" type="checkbox" name="rtoggle" checked="checked">
-    <label for="earthquakes">Earthquakes</label>
-    <br>
-    <input id="tectonic" type="checkbox" name="rtoggle" checked="checked">
-    <label for="tectonic">Tectonic</label>
+    <div id="overlaylist">
+      <input id="earthquakes-layer" type="checkbox" name="rtoggle" checked="checked">
+      <label for="earthquakes-layer">Earthquakes</label>
+      <br>
+      <input id="tectonic-layer" type="checkbox" name="rtoggle" checked="checked">
+      <label for="tectonic-layer">Tectonic</label>
+    </div>
   </div>
 
   <!-- Leaflet JavaScript -->

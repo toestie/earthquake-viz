@@ -94,7 +94,7 @@ function addPlates() {
         });
 
     map.addLayer({
-        'id': 'boundaries',
+        'id': 'tectonic-layer',
         'type': 'line',
         'source': 'tectonic',
         'layout': {
@@ -109,13 +109,36 @@ function addPlates() {
 }
 
 // 4. Give user the ability to switch between map types and toggle overlays
-const layerList = document.getElementById('menu');
+const layerList = document.getElementById('mapslist');
 const inputs = layerList.getElementsByTagName('input');
 
 for (const input of inputs) {
     input.onclick = (layer) => {
         layerId = layer.target.id;
         map.setStyle('mapbox://styles/mapbox/' + layerId);
+    };
+}
+// 5. Give user the ability to toggle visibility of map overlays
+const overlaylist = document.getElementById('overlaylist');
+const inputs2 = overlaylist.getElementsByTagName('input');
+
+for (const a of inputs2) {
+    a.onclick = (overlay) => {
+        overlayId = overlay.target.id;
+        const visibility = map.getLayoutProperty(overlayId,'visibility');
+             
+        // Toggle layer visibility by changing the layout object's visibility property.
+        if (visibility === 'visible') {
+            map.setLayoutProperty(overlayId, 'visibility', 'none');
+            this.className = '';
+        } else {
+            this.className = 'active';
+            map.setLayoutProperty(
+                overlayId,
+                'visibility',
+                'visible'
+            );
+        }
     };
 }
 
