@@ -10,6 +10,9 @@ const map = new mapboxgl.Map({
 map.addControl(new mapboxgl.NavigationControl());
 
 // 2. A function to add the earthquakes to the map and on-click popups.
+let earthquakesvisible = 1;
+let tectonicvisible = 1;
+
 function addEarthquakes() {
     // GeoJSON data by USGS
     map.addSource('earthquakes', {
@@ -84,14 +87,12 @@ function addEarthquakes() {
             )
         .addTo(map);
     });
-}
 
-// 3. A function to add the tectonic plate boundary lines
-function addPlates() {
+    // 3. A function to add the tectonic plate boundary lines
     map.addSource('tectonic', {
-            type: 'geojson',
-            data: 'https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json'
-        });
+        type: 'geojson',
+        data: 'https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json'
+    });
 
     map.addLayer({
         'id': 'tectonic-layer',
@@ -114,7 +115,7 @@ const inputs = layerList.getElementsByTagName('input');
 
 for (const input of inputs) {
     input.onclick = (layer) => {
-        layerId = layer.target.id;
+        var layerId = layer.target.id;
         map.setStyle('mapbox://styles/mapbox/' + layerId);
     };
 }
@@ -124,34 +125,52 @@ const inputs2 = overlaylist.getElementsByTagName('input');
 
 for (const a of inputs2) {
     a.onclick = (overlay) => {
-        overlayId = overlay.target.id;
+        var overlayId = overlay.target.id;
         const visibility = map.getLayoutProperty(overlayId,'visibility');
              
         // Toggle layer visibility by changing the layout object's visibility property.
         if (visibility === 'visible') {
+            if (overlayId === 'earthquakes-layer') {
+                earthquakesvisible -= 1;
+            } else if (overlayId === 'tectonic-layer'){
+                tectonicvisible -= 1;
+            };
             map.setLayoutProperty(overlayId, 'visibility', 'none');
             this.className = '';
         } else {
+            if (overlayId === 'earthquakes-layer') {
+                earthquakesvisible += 1;
+            } else if (overlayId === 'tectonic-layer') {
+                tectonicvisible += 1;
+            };
+            map.setLayoutProperty(overlayId, 'visibility', 'visible');
             this.className = 'active';
-            map.setLayoutProperty(
-                overlayId,
-                'visibility',
-                'visible'
-            );
-        }
+        };
     };
 }
 
 // Have overlays initially already loaded
 map.on('load', () => {
     addEarthquakes();
-    addPlates();
 });
 
 // makes sure elements persist when changing map style
 map.on('style.load', () => {
     addEarthquakes();
-    addPlates();
+    if (earthquakesvisible == 0) {
+        map.setLayoutProperty(
+            'earthquakes-layer',
+            'visibility',
+            'none'
+        );
+    };
+    if (tectonicvisible == 0) {
+        map.setLayoutProperty(
+            'tectonic-layer',
+            'visibility',
+            'none'
+        );
+    };
 });
 
 // map.on('idle', () => {
